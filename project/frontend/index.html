@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>suja.crochet — handmade with love</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/src/styles.css">
+<!-- Razorpay Checkout widget — required for real (non-mock) payments -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="headbar">
+    <div style="display:flex;align-items:center;gap:20px;">
+      <button class="hamburger icon-btn" id="hamburgerBtn">☰</button>
+      <a href="#home" class="logo">
+  <img src="/assets/branding/suja-crochet-logo.jpeg.jpeg" alt="Suja Crochet">
+</a>
+    </div>
+    <nav class="mainnav" id="mainNav">
+      <a href="#home" data-route="home" onclick="return go('home')">Home</a>
+      <a href="#shop" data-route="shop" onclick="return go('shop')">Shop</a>
+      <a href="#categories" data-route="categories" onclick="return go('categories')">Categories</a>
+      <a href="#custom" data-route="custom" onclick="return go('custom')">Custom Orders</a>
+      <a href="#about" data-route="about" onclick="return go('about')">About</a>
+      <a href="#contact" data-route="contact" onclick="return go('contact')">Contact</a>
+    </nav>
+    <div class="head-actions">
+      <div class="search-box">
+        <span>🔍</span>
+        <input id="searchInput" placeholder="Search bouquets, clips, gifts…" />
+      </div>
+      <a href="#account" class="icon-btn" title="Account" onclick="return go('account')">👤</a>
+      <a href="#wishlist" class="icon-btn" title="Wishlist" onclick="return go('wishlist')">♡<span class="badge hide" id="wishBadge">0</span></a>
+      <a href="#cart" class="icon-btn" title="Cart" onclick="return go('cart')">🧺<span class="badge hide" id="cartBadge">0</span></a>
+    </div>
+  </div>
+  <div class="mobilenav" id="mobileNav">
+    <div class="mobile-search-box">
+      <span>🔍</span>
+      <input id="mobileSearchInput" placeholder="Search bouquets, clips, gifts…" />
+    </div>
+    <a href="#home" onclick="return go('home')">Home</a>
+    <a href="#shop" onclick="return go('shop')">Shop</a>
+    <a href="#categories" onclick="return go('categories')">Categories</a>
+    <a href="#custom" onclick="return go('custom')">Custom Orders</a>
+    <a href="#about" onclick="return go('about')">About</a>
+    <a href="#contact" onclick="return go('contact')">Contact</a>
+    <a href="#account" onclick="return go('account')">My Account</a>
+    <a href="#wishlist" onclick="return go('wishlist')">My Wishlist</a>
+  </div>
+</header>
+
+<main id="app"></main>
+
+<div class="toast" id="toast"></div>
+
+<!-- Floating WhatsApp Support -->
+<a href="https://wa.me/919561742713?text=Hi%20Suja%20Crochet,%20I%20have%20an%20inquiry%20about%20your%20handmade%20items!" target="_blank" rel="noopener noreferrer" class="floating-whatsapp" id="floatingWhatsapp" title="Chat on WhatsApp">
+  <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 6.46 17.5 2 12.04 2M12.05 3.67C16.58 3.67 20.28 7.37 20.28 11.92C20.28 16.46 16.58 20.17 12.05 20.17C10.56 20.17 9.13 19.77 7.89 19.03L7.59 18.86L4.47 19.68L5.31 16.64L5.12 16.33C4.31 15.04 3.79 13.51 3.79 11.92C3.79 7.37 7.5 3.67 12.05 3.67M9.05 7.42C8.88 7.42 8.6 7.48 8.37 7.74C8.13 8 7.47 8.62 7.47 9.87C7.47 11.13 8.39 12.34 8.52 12.51C8.65 12.68 10.32 15.26 12.89 16.37C15.03 17.29 15.46 17.11 15.93 17.06C16.4 17.02 17.43 16.45 17.65 15.84C17.86 15.23 17.86 14.7 17.8 14.6C17.74 14.49 17.56 14.43 17.3 14.3C17.04 14.17 15.76 13.54 15.52 13.45C15.28 13.37 15.11 13.32 14.94 13.58C14.77 13.85 14.28 14.43 14.13 14.6C13.98 14.77 13.84 14.79 13.58 14.66C13.32 14.53 12.49 14.26 11.51 13.38C10.74 12.7 10.22 11.86 10.07 11.6C9.92 11.34 10.05 11.2 10.18 11.07C10.3 10.95 10.45 10.75 10.59 10.59C10.73 10.42 10.77 10.3 10.86 10.12C10.95 9.95 10.91 9.8 10.84 9.67C10.77 9.55 10.27 8.32 10.06 7.82C9.86 7.33 9.65 7.4 9.49 7.39C9.34 7.39 9.17 7.42 9.05 7.42Z"/>
+  </svg>
+  <span>Chat with us</span>
+</a>
+
+<script type="module" src="/src/app.js"></script>
+</body>
+</html>

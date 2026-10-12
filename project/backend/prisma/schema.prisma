@@ -1,0 +1,222 @@
+// suja.crochet — database schema
+// Defaults to SQLite for zero-config local development.
+// For production, change the datasource to postgresql and point
+// DATABASE_URL at a real Postgres instance (see README.md).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  phone        String?
+  passwordHash String?
+  role         String   @default("customer") // "customer" | "admin"
+  createdAt    DateTime @default(now())
+
+  addresses    Address[]
+  orders       Order[]
+  wishlist     WishlistItem[]
+  reviews      Review[]
+  customOrders CustomOrder[]
+}
+
+model Address {
+  id        String  @id @default(uuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  fullName  String
+  phone     String
+  line1     String
+  city      String
+  state     String
+  pincode   String
+  isDefault Boolean @default(false)
+
+  orders Order[]
+}
+
+model Category {
+  id          String  @id // "gift" | "hair" | "bouquets" | "decor" | "custom"
+  name        String
+  description String?
+  emoji       String?
+
+  products Product[]
+}
+
+model Product {
+  id            String   @id @default(uuid())
+  name          String
+  categoryId    String
+  category      Category @relation(fields: [categoryId], references: [id])
+  description   String?
+  materials     String?
+  sizeInfo      String?
+  price         Int
+  mrp           Int?
+  colorsJson    String   @default("[]") // JSON-encoded array of hex colors
+  emoji         String   @default("🧶") // placeholder visual until real photos are added
+  stock         Int      @default(20)
+  isBestseller  Boolean  @default(false)
+  isNewArrival  Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  images      ProductImage[]
+  orderItems  OrderItem[]
+  reviews     Review[]
+  wishlistedBy WishlistItem[]
+}
+
+model ProductImage {
+  id        String  @id @default(uuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  sortOrder Int     @default(0)
+}
+
+model Order {
+  id                     String    @id @default(uuid())
+  orderNumber            String    @unique
+  userId                 String?
+  user                   User?     @relation(fields: [userId], references: [id])
+  addressId              String?
+  address                Address?  @relation(fields: [addressId], references: [id])
+  customerName           String
+  customerEmail          String
+  customerPhone          String
+  // Denormalized shipping address — always saved, even for guest checkout
+  // (the Address relation above only exists for signed-in users).
+  shippingLine1          String?
+  shippingCity           String?
+  shippingState          String?
+  shippingPincode        String?
+  subtotal               Int
+  deliveryFee            Int       @default(0)
+  discount               Int       @default(0)
+  total                  Int
+  status                 String    @default("order_placed")
+  // order_placed | handmade_preparation | packed | shipped | out_for_delivery | delivered | cancelled
+  estimatedDeliveryDate  DateTime?
+  trackingNumber         String?
+  createdAt              DateTime  @default(now())
+
+  items          OrderItem[]
+  payments       Payment[]
+  returnRequests ReturnRequest[]
+  reviews        Review[]
+}
+
+model OrderItem {
+  id            String  @id @default(uuid())
+  orderId       String
+  order         Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product @relation(fields: [productId], references: [id])
+  quantity      Int
+  unitPrice     Int
+  selectedColor String?
+  customNote    String?
+
+  returnRequests ReturnRequest[]
+}
+
+model Payment {
+  id                String   @id @default(uuid())
+  orderId           String
+  order             Order    @relation(fields: [orderId], references: [id])
+  provider          String   @default("razorpay") // "razorpay" | "cod"
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+  razorpaySignature String?
+  amount            Int
+  status            String   @default("pending") // pending | paid | failed | refunded
+  createdAt         DateTime @default(now())
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  orderId   String?
+  order     Order?   @relation(fields: [orderId], references: [id])
+  rating    Int
+  text      String
+  status    String   @default("pending") // pending | approved | hidden
+  createdAt DateTime @default(now())
+}
+
+model WishlistItem {
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@id([userId, productId])
+}
+
+model CustomOrder {
+  id                    String   @id @default(uuid())
+  userId                String?
+  user                  User?    @relation(fields: [userId], references: [id])
+  name                  String
+  email                 String
+  phone                 String
+  productType           String
+  preferredColor        String?
+  size                  String?
+  quantity              Int      @default(1)
+  occasion              String?
+  budget                String?
+  requirements          String?
+  referenceImageUrl     String?
+  preferredDeliveryDate DateTime?
+  status                String   @default("new")
+  // new | reviewing | accepted | in_progress | completed | rejected
+  createdAt             DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  message   String
+  status    String   @default("new")
+  // new | read | replied
+  createdAt DateTime @default(now())
+}
+
+model ReturnRequest {
+  id           String   @id @default(uuid())
+  orderId      String
+  order        Order    @relation(fields: [orderId], references: [id])
+  orderItemId  String
+  orderItem    OrderItem @relation(fields: [orderItemId], references: [id])
+  description  String
+  proofUrlsJson String  @default("[]")
+  status       String   @default("submitted")
+  // submitted | approved | rejected | more_info_needed | resolved
+  adminNotes   String?
+  createdAt    DateTime @default(now())
+}
+
+model Coupon {
+  code            String   @id
+  discountType    String   // "flat" | "percent"
+  discountValue   Int
+  minOrderValue   Int      @default(0)
+  active          Boolean  @default(true)
+  expiresAt       DateTime?
+}
